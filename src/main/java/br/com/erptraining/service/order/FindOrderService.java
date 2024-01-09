@@ -28,4 +28,11 @@ public class FindOrderService {
         if (allOrder.isEmpty()) return 0;
         return allOrder.get(0).getOrderNumber();
     }
+
+    public boolean discountPermission(UUID id){
+        Order order = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Order.class.getSimpleName(), id));
+
+        return order.getOrderDiscount().isDiscountPermission();
+    }
 }

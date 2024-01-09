@@ -34,4 +34,7 @@ public class OrderDiscount {
 
     @Column(name = "discount_date")
     private LocalDateTime discountDate;
+
+    @Column(name = "discount_applied")
+    private boolean discountApplied = false;
 }

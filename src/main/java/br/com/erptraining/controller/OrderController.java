@@ -5,6 +5,7 @@ import br.com.erptraining.dtos.order.DiscountOrderDTO;
 import br.com.erptraining.dtos.orderItem.CreateOrderItemDTO;
 import br.com.erptraining.service.order.FindOrderService;
 import br.com.erptraining.service.order.OrderItemService;
+import br.com.erptraining.service.order.UpdateOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ public class OrderController {
 
     private final OrderItemService orderItemService;
     private final FindOrderService find;
+    private final UpdateOrderService update;
 
     @PostMapping
     public ResponseEntity<Order> create(@RequestBody @Valid CreateOrderItemDTO orderItemData, UriComponentsBuilder uriBuilder) {
@@ -42,9 +44,13 @@ public class OrderController {
 
     }
 
-    @PutMapping("/{id}")
-    public void applyDiscount(@PathVariable UUID id, @RequestBody @Valid DiscountOrderDTO discountData, UriComponentsBuilder uriBuilder){
+    @PutMapping("/discount/{id}")
+    public ResponseEntity<Order> applyDiscount(@PathVariable UUID id, @RequestBody @Valid DiscountOrderDTO discountData, UriComponentsBuilder uriBuilder){
+        Order order = update.applyDiscount(discountData, id);
 
+        URI uri = uriBuilder.path("/api/order/{id}").buildAndExpand(order.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(order);
     }
 
     @GetMapping("/{id}")
