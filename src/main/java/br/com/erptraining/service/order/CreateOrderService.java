@@ -1,8 +1,10 @@
 package br.com.erptraining.service.order;
 
 import br.com.erptraining.domain.Order;
+import br.com.erptraining.domain.OrderDiscount;
 import br.com.erptraining.domain.OrderItem;
 import br.com.erptraining.enums.OrderStatus;
+import br.com.erptraining.enums.ProductType;
 import br.com.erptraining.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ public class CreateOrderService {
 
     private final OrderRepository repository;
     private final FindOrderService find;
+    private final UtilitiesOrderService utilites;
 
     @Transactional
     public Order newOrder(OrderItem orderItem) {
@@ -25,9 +28,16 @@ public class CreateOrderService {
         List<OrderItem> orderItemList = new ArrayList<>();
         orderItemList.add(orderItem);
 
+        boolean discountPermission = utilites.validateDiscountPermissionOnOrderItem(orderItem);
+
+        OrderDiscount discount = OrderDiscount.builder()
+                .discountPermission(discountPermission)
+                .build();
+
         Order order = Order.builder()
                 .orderNumber(lastOrderNumber)
                 .orderItems(orderItemList)
+                .orderDiscount(discount)
                 .totalOrder(orderItem.getTotalPrice())
                 .orderStatus(OrderStatus.OPEN)
                 .build();

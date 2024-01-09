@@ -1,6 +1,7 @@
 package br.com.erptraining.controller;
 
 import br.com.erptraining.domain.Order;
+import br.com.erptraining.dtos.order.DiscountOrderDTO;
 import br.com.erptraining.dtos.orderItem.CreateOrderItemDTO;
 import br.com.erptraining.service.order.FindOrderService;
 import br.com.erptraining.service.order.OrderItemService;
@@ -38,6 +39,11 @@ public class OrderController {
         URI uri = uriBuilder.path("/api/order/{id}").buildAndExpand(order.getId()).toUri();
 
         return ResponseEntity.created(uri).body(order);
+
+    }
+
+    @PutMapping("/{id}")
+    public void applyDiscount(@PathVariable UUID id, @RequestBody @Valid DiscountOrderDTO discountData, UriComponentsBuilder uriBuilder){
 
     }
 
