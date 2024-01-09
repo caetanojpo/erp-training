@@ -1,5 +1,6 @@
 package br.com.erptraining.domain;
 
+import br.com.erptraining.dtos.product.CreateProductDTO;
 import br.com.erptraining.enums.ProductSituation;
 import br.com.erptraining.enums.ProductType;
 import jakarta.persistence.Column;
@@ -42,11 +43,11 @@ public class Product {
     @Column(name = "value", nullable = false)
     private BigDecimal price;
 
-    @Column(name = "product-type", nullable = false)
+    @Column(name = "product_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductType productType;
 
-    @Column(name = "product-situation", nullable = false)
+    @Column(name = "product_situation", nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductSituation productSituation;
 
@@ -57,6 +58,5 @@ public class Product {
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
 
 }

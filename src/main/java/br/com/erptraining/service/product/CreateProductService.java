@@ -3,7 +3,6 @@ package br.com.erptraining.service.product;
 import br.com.erptraining.domain.Product;
 import br.com.erptraining.dtos.product.CreateProductDTO;
 import br.com.erptraining.enums.ProductSituation;
-import br.com.erptraining.mapper.ProductMapper;
 import br.com.erptraining.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,9 +15,14 @@ public class CreateProductService {
     private final ProductRepository repository;
 
     @Transactional
-    public Product save(CreateProductDTO productData){
+    public Product save(CreateProductDTO productData) {
 
-        Product product = ProductMapper.INSTANCE.toCreateProduct(productData);
+        Product product = Product.builder()
+                .name(productData.name())
+                .description(productData.description())
+                .price(productData.price())
+                .productType(productData.productType())
+                .build();
 
         product.setProductSituation(ProductSituation.ACTIVATED);
 

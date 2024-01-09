@@ -32,6 +32,6 @@ public class OrderDiscount {
     @Column(name = "discount_origin")
     private DiscountOrigin discountOrigin;
 
-    @Column(name = "discount_date", nullable = false)
+    @Column(name = "discount_date")
     private LocalDateTime discountDate;
 }

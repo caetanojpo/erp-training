@@ -1,6 +1,7 @@
 package br.com.erptraining.service.product;
 
 import br.com.erptraining.domain.Product;
+import br.com.erptraining.exception.EntityNotFoundException;
 import br.com.erptraining.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ public class FindProductService {
     private final ProductRepository repository;
 
     public Product byId(UUID id) {
-        return repository.getReferenceById(id);
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(Product.class.getSimpleName(), id));
     }
 }
