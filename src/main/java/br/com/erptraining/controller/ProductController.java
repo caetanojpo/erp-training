@@ -2,6 +2,8 @@ package br.com.erptraining.controller;
 
 import br.com.erptraining.domain.Product;
 import br.com.erptraining.dtos.product.CreateProductDTO;
+import br.com.erptraining.dtos.product.DetailProductDTO;
+import br.com.erptraining.mapper.ProductMapper;
 import br.com.erptraining.service.product.CreateProductService;
 import br.com.erptraining.service.product.FindProductService;
 import jakarta.validation.Valid;
@@ -27,15 +29,21 @@ public class ProductController {
     private final FindProductService find;
 
     @PostMapping
-    public ResponseEntity<Product> create(@RequestBody CreateProductDTO productData, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<DetailProductDTO> create(@RequestBody CreateProductDTO productData, UriComponentsBuilder uriBuilder) {
         Product product = create.save(productData);
         URI uri = uriBuilder.path("/api/product/{id}").buildAndExpand(product.getId()).toUri();
-        return ResponseEntity.created(uri).body(product);
+
+        DetailProductDTO deitaledProduct = ProductMapper.INSTANCE.toDetailProduct(product);
+
+        return ResponseEntity.created(uri).body(deitaledProduct);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> detail(@PathVariable UUID id) {
+    public ResponseEntity<DetailProductDTO> detail(@PathVariable UUID id) {
         Product product = find.byId(id);
-        return ResponseEntity.ok(product);
+
+        DetailProductDTO deitaledProduct = ProductMapper.INSTANCE.toDetailProduct(product);
+
+        return ResponseEntity.ok(deitaledProduct);
     }
 }
