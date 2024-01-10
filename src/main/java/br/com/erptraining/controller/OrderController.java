@@ -1,8 +1,10 @@
 package br.com.erptraining.controller;
 
 import br.com.erptraining.domain.Order;
+import br.com.erptraining.dtos.order.DetailOrderDTO;
 import br.com.erptraining.dtos.order.DiscountOrderDTO;
-import br.com.erptraining.dtos.orderItem.CreateOrderItemDTO;
+import br.com.erptraining.dtos.orderitem.CreateOrderItemDTO;
+import br.com.erptraining.mapper.OrderMapper;
 import br.com.erptraining.service.order.FindOrderService;
 import br.com.erptraining.service.order.OrderItemService;
 import br.com.erptraining.service.order.UpdateOrderService;
@@ -25,37 +27,44 @@ public class OrderController {
     private final UpdateOrderService update;
 
     @PostMapping
-    public ResponseEntity<Order> create(@RequestBody @Valid CreateOrderItemDTO orderItemData, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<DetailOrderDTO> create(@RequestBody CreateOrderItemDTO orderItemData, UriComponentsBuilder uriBuilder) {
         Order order = orderItemService.saveOnNewOrder(orderItemData);
 
         URI uri = uriBuilder.path("/api/order/{id}").buildAndExpand(order.getId()).toUri();
 
-        return ResponseEntity.created(uri).body(order);
+        DetailOrderDTO detailedOrder = OrderMapper.INSTANCE.toDetailOrder(order);
+
+        return ResponseEntity.created(uri).body(detailedOrder);
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Order> addToExistingOrder(@PathVariable UUID id, @RequestBody @Valid CreateOrderItemDTO orderItemData, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<DetailOrderDTO> addToExistingOrder(@PathVariable UUID id, @RequestBody CreateOrderItemDTO orderItemData, UriComponentsBuilder uriBuilder) {
 
         Order order = orderItemService.saveOnExistingOrder(orderItemData, id);
 
         URI uri = uriBuilder.path("/api/order/{id}").buildAndExpand(order.getId()).toUri();
 
-        return ResponseEntity.created(uri).body(order);
+        DetailOrderDTO detailedOrder = OrderMapper.INSTANCE.toDetailOrder(order);
+
+        return ResponseEntity.created(uri).body(detailedOrder);
 
     }
 
     @PutMapping("/discount/{id}")
-    public ResponseEntity<Order> applyDiscount(@PathVariable UUID id, @RequestBody @Valid DiscountOrderDTO discountData, UriComponentsBuilder uriBuilder){
+    public ResponseEntity<DetailOrderDTO> applyDiscount(@PathVariable UUID id, @RequestBody DiscountOrderDTO discountData, UriComponentsBuilder uriBuilder){
         Order order = update.applyDiscount(discountData, id);
 
         URI uri = uriBuilder.path("/api/order/{id}").buildAndExpand(order.getId()).toUri();
 
-        return ResponseEntity.created(uri).body(order);
+        DetailOrderDTO detailedOrder = OrderMapper.INSTANCE.toDetailOrder(order);
+
+        return ResponseEntity.ok(detailedOrder);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Order> detail(@PathVariable UUID id) {
+    public ResponseEntity<DetailOrderDTO> detail(@PathVariable UUID id) {
         Order order = find.byId(id);
-        return ResponseEntity.ok(order);
+        DetailOrderDTO detailedOrder = OrderMapper.INSTANCE.toDetailOrder(order);
+        return ResponseEntity.ok(detailedOrder);
     }
 }

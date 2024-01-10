@@ -1,14 +1,8 @@
 package br.com.erptraining.domain;
 
-import br.com.erptraining.dtos.product.CreateProductDTO;
 import br.com.erptraining.enums.ProductSituation;
 import br.com.erptraining.enums.ProductType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

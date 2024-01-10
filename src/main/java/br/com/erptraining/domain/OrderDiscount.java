@@ -7,8 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,7 +24,7 @@ public class OrderDiscount {
     @Column(name = "discount_percent")
     private BigDecimal discountPercent;
 
-    @Column(name = "discount-value")
+    @Column(name = "discount_value")
     private BigDecimal discountValue;
 
     @Column(name = "discount_origin")
@@ -36,5 +34,5 @@ public class OrderDiscount {
     private LocalDateTime discountDate;
 
     @Column(name = "discount_applied")
-    private boolean discountApplied = false;
+    private boolean discountApplied;
 }

@@ -1,6 +1,5 @@
 package br.com.erptraining.domain;
 
-import br.com.erptraining.dtos.orderItem.CreateOrderItemDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

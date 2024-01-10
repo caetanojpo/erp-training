@@ -1,7 +1,7 @@
 package br.com.erptraining.dtos.order;
 
 import br.com.erptraining.domain.OrderDiscount;
-import br.com.erptraining.dtos.orderItem.DetailOrderItem;
+import br.com.erptraining.dtos.orderitem.DetailOrderItem;
 import br.com.erptraining.enums.OrderStatus;
 
 import java.math.BigDecimal;

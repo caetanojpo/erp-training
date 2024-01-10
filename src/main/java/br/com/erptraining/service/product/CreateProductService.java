@@ -26,8 +26,6 @@ public class CreateProductService {
 
         product.setProductSituation(ProductSituation.ACTIVATED);
 
-        repository.save(product);
-
-        return product;
+        return repository.save(product);
     }
 }

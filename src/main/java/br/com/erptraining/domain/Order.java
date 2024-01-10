@@ -1,17 +1,7 @@
 package br.com.erptraining.domain;
 
 import br.com.erptraining.enums.OrderStatus;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,12 +34,12 @@ public class Order {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "order_item_id")
-    private List<OrderItem>orderItems = new ArrayList<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @Embedded
     private OrderDiscount orderDiscount;
 
-    @Column(name = "totalOrder", nullable = false)
+    @Column(name = "total_order", nullable = false)
     private BigDecimal totalOrder;
 
     @Column(name = "order_status", nullable = false)

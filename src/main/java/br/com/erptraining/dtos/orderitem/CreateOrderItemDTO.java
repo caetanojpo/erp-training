@@ -1,4 +1,4 @@
-package br.com.erptraining.dtos.orderItem;
+package br.com.erptraining.dtos.orderitem;
 
 import java.util.UUID;
 

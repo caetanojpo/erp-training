@@ -35,10 +35,6 @@ public class UpdateOrderService {
         if (!discountViability) {
             OrderDiscount discount = OrderDiscount.builder()
                     .discountPermission(false)
-                    .discountValue(null)
-                    .discountOrigin(null)
-                    .discountPercent(null)
-                    .discountDate(null)
                     .build();
 
             order.setOrderDiscount(discount);
@@ -47,13 +43,7 @@ public class UpdateOrderService {
         BigDecimal currentOrderValue = order.getTotalOrder();
         order.setTotalOrder(currentOrderValue.add(orderItem.getTotalPrice()));
 
-        repository.save(order);
-        return order;
-    }
-
-    public void orderStatus(String newStatus, UUID orderUUID) {
-        Order order = find.byId(orderUUID);
-        order.setOrderStatus(utilities.getReadableStatus(newStatus));
+        return repository.save(order);
     }
 
     public Order applyDiscount(DiscountOrderDTO discountData, UUID orderUUID) {
@@ -64,11 +54,29 @@ public class UpdateOrderService {
 
         Order order = find.byId(orderUUID);
 
-        if(order.getOrderDiscount().isDiscountApplied()) { throw new DiscountOrderException("Discount already applied to the present order!");}
+        if (order.getOrderDiscount().isDiscountApplied()) {
+            throw new DiscountOrderException("Discount already applied to the present order!");
+        }
 
         BigDecimal discountValue = discountData.discountValue() != null ? discountData.discountValue() : this.calculateDiscountValue(discountData.discountPercent(), order.getTotalOrder());
 
-        OrderDiscount orderDiscount = OrderDiscount.builder()
+        OrderDiscount orderDiscount = generateOrderDiscount(discountData, discountValue);
+
+        order.setOrderDiscount(orderDiscount);
+        BigDecimal actualTotalValue = order.getTotalOrder();
+        order.setTotalOrder(actualTotalValue.subtract(discountValue));
+
+        return repository.save(order);
+    }
+
+    private BigDecimal calculateDiscountValue(BigDecimal percent, BigDecimal totalOrderValue) {
+        return totalOrderValue.multiply(percent.divide(new BigDecimal(100), 2, RoundingMode.HALF_UP))
+                .setScale(2, RoundingMode.HALF_UP);
+
+    }
+
+    private OrderDiscount generateOrderDiscount(DiscountOrderDTO discountData, BigDecimal discountValue) {
+       return OrderDiscount.builder()
                 .discountPermission(true)
                 .discountOrigin(discountData.discountOrigin())
                 .discountPercent(discountData.discountPercent() != null ? discountData.discountPercent() : null)
@@ -76,20 +84,5 @@ public class UpdateOrderService {
                 .discountDate(LocalDateTime.now(ZoneId.systemDefault()))
                 .discountApplied(true)
                 .build();
-
-        order.setOrderDiscount(orderDiscount);
-        BigDecimal actualTotalValue = order.getTotalOrder();
-        order.setTotalOrder(actualTotalValue.subtract(discountValue));
-
-        repository.save(order);
-
-        return order;
-
-    }
-
-    private BigDecimal calculateDiscountValue(BigDecimal percent, BigDecimal totalOrderValue) {
-        return  totalOrderValue.multiply(percent.divide(new BigDecimal(100), 2, RoundingMode.HALF_UP))
-                .setScale(2, RoundingMode.HALF_UP);
-
     }
 }

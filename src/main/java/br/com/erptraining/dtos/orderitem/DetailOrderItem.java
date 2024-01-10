@@ -1,4 +1,4 @@
-package br.com.erptraining.dtos.orderItem;
+package br.com.erptraining.dtos.orderitem;
 
 import br.com.erptraining.dtos.product.DetailProductDTO;
 

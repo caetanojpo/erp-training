@@ -27,7 +27,7 @@ public class ProductController {
     private final FindProductService find;
 
     @PostMapping
-    public ResponseEntity<Product> create(@RequestBody @Valid CreateProductDTO productData, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<Product> create(@RequestBody CreateProductDTO productData, UriComponentsBuilder uriBuilder) {
         Product product = create.save(productData);
         URI uri = uriBuilder.path("/api/product/{id}").buildAndExpand(product.getId()).toUri();
         return ResponseEntity.created(uri).body(product);

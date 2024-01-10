@@ -4,7 +4,7 @@ package br.com.erptraining.service.order;
 import br.com.erptraining.domain.Order;
 import br.com.erptraining.domain.OrderItem;
 import br.com.erptraining.domain.Product;
-import br.com.erptraining.dtos.orderItem.CreateOrderItemDTO;
+import br.com.erptraining.dtos.orderitem.CreateOrderItemDTO;
 import br.com.erptraining.repository.OrderItemRepository;
 import br.com.erptraining.service.product.FindProductService;
 import lombok.RequiredArgsConstructor;
