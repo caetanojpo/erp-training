@@ -5,6 +5,10 @@ import br.com.erptraining.domain.Order;
 import br.com.erptraining.domain.OrderItem;
 import br.com.erptraining.domain.Product;
 import br.com.erptraining.dtos.orderitem.CreateOrderItemDTO;
+import br.com.erptraining.dtos.orderitem.UpdateOrderItemDTO;
+import br.com.erptraining.enums.ProductSituation;
+import br.com.erptraining.exception.EntityNotFoundException;
+import br.com.erptraining.exception.ProductException;
 import br.com.erptraining.repository.OrderItemRepository;
 import br.com.erptraining.service.product.FindProductService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +28,7 @@ public class OrderItemService {
     private final FindProductService findProduct;
     private final CreateOrderService createOrder;
     private final UpdateOrderService updateOrder;
+    private final FindOrderService findOrder;
 
 
     @Transactional
@@ -35,9 +40,6 @@ public class OrderItemService {
 
         orderItem.setOrder(order);
 
-        //TODO Pode devolver o save direto
-        repository.save(orderItem);
-
         return order;
     }
 
@@ -46,33 +48,32 @@ public class OrderItemService {
 
         OrderItem orderItem = formatOrderItem(orderItemData);
 
-        Order order = updateOrder.update(orderItem, orderUUID);
+        Order order = updateOrder.addNewOrderItem(orderItem, orderUUID);
 
         orderItem.setOrder(order);
-
-        //TODO Pode devolver o save direto
-        repository.save(orderItem);
 
         return order;
     }
 
+    public long isProductInOrder(UUID productId) {
+        return findOrder.list().stream()
+                .filter(order -> order.getOrderItems().stream()
+                        .anyMatch(orderItem -> orderItem.getProduct().getId().equals(productId)))
+                .count();
+    }
+
+    public OrderItem modifyQuantity(UUID id, UpdateOrderItemDTO orderItemData) {
+        OrderItem orderItem = repository.findById(id).orElseThrow(() -> new EntityNotFoundException(OrderItem.class.getSimpleName(), id));
+
+        orderItem.setQuantity(orderItemData.quantity());
+
+        return repository.save((orderItem));
+    }
 
     private OrderItem formatOrderItem(CreateOrderItemDTO orderItemData) {
 
-//        Product product = findProduct.byId(orderItemData.product_id());
-//
-//        OrderItem orderItem = OrderItem.builder()
-//                .product(product)
-//                .quantity(orderItemData.quantity()).build();
-//
-//        BigDecimal totalValue = product.getPrice().multiply(BigDecimal.valueOf(orderItemData.quantity()));
-//
-//        orderItem.setTotalPrice(totalValue);
-//
-//        return orderItem;
-
-        //TODO voce pode fazer o inverso, nao utilizar o set e retornar a propria criação do objeto
         Product product = findProduct.byId(orderItemData.product_id());
+        verifyProductStatus(product);
         BigDecimal totalValue = product.getPrice().multiply(BigDecimal.valueOf(orderItemData.quantity()));
 
         return OrderItem.builder()
@@ -80,5 +81,12 @@ public class OrderItemService {
                 .quantity(orderItemData.quantity())
                 .totalPrice(totalValue)
                 .build();
+    }
+
+
+    private void verifyProductStatus(Product product) {
+        if (product.getProductSituation().equals(ProductSituation.DISABLED)) {
+            throw new ProductException("The current product is DISABLED!");
+        }
     }
 }

@@ -22,7 +22,7 @@ public class CreateOrderService {
 
     @Transactional
     public Order newOrder(OrderItem orderItem) {
-        Integer lastOrderNumber = find.lastOrderNumber() + 1;
+        Integer newOrderNumber = find.lastOrderNumber() + 1;
 
         List<OrderItem> orderItemList = List.of(orderItem);
 
@@ -32,16 +32,19 @@ public class CreateOrderService {
                 .discountPermission(discountPermission)
                 .build();
 
-        //TODO crie a geração de objeto em outro método privado, para deixar esse método mais clean e com menos responsabilidade
-        Order order = Order.builder()
-                .orderNumber(lastOrderNumber)
+        Order order = generateOrder(newOrderNumber, orderItemList, discount, orderItem);
+
+       return repository.save(order);
+
+    }
+
+    private Order generateOrder(Integer orderNumber, List<OrderItem> orderItemList, OrderDiscount discount, OrderItem orderItem){
+        return Order.builder()
+                .orderNumber(orderNumber)
                 .orderItems(orderItemList)
                 .orderDiscount(discount)
                 .totalOrder(orderItem.getTotalPrice())
                 .orderStatus(OrderStatus.OPEN)
                 .build();
-
-       return repository.save(order);
-
     }
 }

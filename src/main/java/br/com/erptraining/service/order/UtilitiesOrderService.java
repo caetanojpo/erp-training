@@ -15,4 +15,6 @@ public class UtilitiesOrderService {
         boolean newOrderItemDiscountPermission = orderItem.getProduct().getProductType().equals(ProductType.MATERIAL);
         return newOrderItemDiscountPermission == actualDiscountPermission;
     }
+
+
 }

@@ -4,7 +4,10 @@ import br.com.erptraining.domain.Order;
 import br.com.erptraining.domain.OrderDiscount;
 import br.com.erptraining.domain.OrderItem;
 import br.com.erptraining.dtos.order.DiscountOrderDTO;
+import br.com.erptraining.dtos.orderitem.UpdateOrderItemDTO;
+import br.com.erptraining.enums.OrderStatus;
 import br.com.erptraining.exception.DiscountOrderException;
+import br.com.erptraining.exception.OrderException;
 import br.com.erptraining.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,8 +27,10 @@ public class UpdateOrderService {
     private final FindOrderService find;
     private final UtilitiesOrderService utilities;
 
-    public Order update(OrderItem orderItem, UUID orderUUID) {
+    public Order addNewOrderItem(OrderItem orderItem, UUID orderUUID) {
         Order order = find.byId(orderUUID);
+
+        verifyOrderStatus(order.getOrderStatus());
 
         List<OrderItem> orderItems = order.getOrderItems();
         orderItems.add(orderItem);
@@ -46,17 +51,21 @@ public class UpdateOrderService {
         return repository.save(order);
     }
 
-    public Order applyDiscount(DiscountOrderDTO discountData, UUID orderUUID) {
-        boolean discountPermission = find.discountPermission(orderUUID);
-        if (!discountPermission) {
-            throw new DiscountOrderException("The present Order has a Service. Services are ineligible to receive a discount");
-        }
+    public Order removeOrderItem(UUID orderUUID, UUID orderItemUUID){
 
         Order order = find.byId(orderUUID);
 
-        if (order.getOrderDiscount().isDiscountApplied()) {
-            throw new DiscountOrderException("Discount already applied to the present order!");
-        }
+        order.getOrderItems().removeIf(orderItem -> orderItem.getId().equals(orderItemUUID));
+
+        return repository.save(order);
+
+    }
+
+    public Order applyDiscount(DiscountOrderDTO discountData, UUID orderUUID) {
+
+        Order order = find.byId(orderUUID);
+
+        validateDiscountPossibility(order);
 
         BigDecimal discountValue = discountData.discountValue() != null ? discountData.discountValue() : this.calculateDiscountValue(discountData.discountPercent(), order.getTotalOrder());
 
@@ -67,6 +76,29 @@ public class UpdateOrderService {
         order.setTotalOrder(actualTotalValue.subtract(discountValue));
 
         return repository.save(order);
+    }
+
+
+
+    private void verifyOrderStatus(OrderStatus status) {
+        if(!status.equals(OrderStatus.OPEN)){
+            throw new OrderException("Order's status isn't OPEN. Can't make new changes");
+        }
+    }
+
+    private void validateDiscountPossibility(Order order){
+
+        verifyOrderStatus(order.getOrderStatus());
+
+        boolean discountPermission = find.discountPermission(order.getId());
+        if (!discountPermission) {
+            throw new DiscountOrderException("The present Order has a Service. Services are ineligible to receive a discount");
+        }
+
+        if (order.getOrderDiscount().isDiscountApplied()) {
+            throw new DiscountOrderException("Discount already applied to the present order!");
+        }
+
     }
 
     private BigDecimal calculateDiscountValue(BigDecimal percent, BigDecimal totalOrderValue) {

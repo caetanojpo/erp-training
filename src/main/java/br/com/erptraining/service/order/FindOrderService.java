@@ -2,9 +2,12 @@ package br.com.erptraining.service.order;
 
 import br.com.erptraining.domain.Order;
 import br.com.erptraining.domain.OrderDiscount;
+import br.com.erptraining.enums.OrderStatus;
 import br.com.erptraining.exception.EntityNotFoundException;
 import br.com.erptraining.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -22,6 +25,15 @@ public class FindOrderService {
                 .orElseThrow(() -> new EntityNotFoundException(Order.class.getSimpleName(), id));
     }
 
+    public Page<Order> paginateList(Pageable pagination) {
+        return repository.findAll(pagination);
+    }
+
+    public List<Order> list() {
+        return repository.findAll();
+    }
+
+
     public Integer lastOrderNumber() {
         List<Order> allOrder = repository.findAll();
         Collections.reverse(allOrder);
@@ -30,16 +42,17 @@ public class FindOrderService {
     }
 
     public boolean discountPermission(UUID id) {
-        //TODO troque essa forma de implementar (Programação imperativa):
-//        Order order = repository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException(Order.class.getSimpleName(), id));
-//
-//        return order.getOrderDiscount().isDiscountPermission();
-
-        //TODO por essa (Programação funcional), pois dessa forma você garante que não vai ter null pointer exception em nenhum momento nessa aninhamento: "order.getOrderDiscount().isDiscountPermission()"
         return repository.findById(id)
                 .map(Order::getOrderDiscount)
                 .map(OrderDiscount::isDiscountPermission)
                 .orElseThrow(() -> new EntityNotFoundException(Order.class.getSimpleName(), id));
+    }
+
+    public boolean verifyOrderStatus(UUID id) {
+        OrderStatus status = repository.findById(id)
+                .map(Order::getOrderStatus)
+                .orElseThrow(() -> new EntityNotFoundException(Order.class.getSimpleName(), id));
+
+        return status.equals(OrderStatus.OPEN);
     }
 }
