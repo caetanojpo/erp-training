@@ -43,7 +43,7 @@ public class ControllerAdvice {
     }
 
     private boolean isUniqueConstraintViolation(PSQLException ex) {
-        return "23505".equals(ex.getSQLState()); // SQLState 23505 represents a unique constraint violation
+        return "23505".equals(ex.getSQLState());
     }
 
     private String extractConstraintName(PSQLException ex) {
