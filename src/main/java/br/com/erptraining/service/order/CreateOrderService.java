@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.ArrayList; //TODO import desnecessario
 import java.util.List;
 
 @Service
@@ -32,6 +32,7 @@ public class CreateOrderService {
                 .discountPermission(discountPermission)
                 .build();
 
+        //TODO crie a geração de objeto em outro método privado, para deixar esse método mais clean e com menos responsabilidade
         Order order = Order.builder()
                 .orderNumber(lastOrderNumber)
                 .orderItems(orderItemList)

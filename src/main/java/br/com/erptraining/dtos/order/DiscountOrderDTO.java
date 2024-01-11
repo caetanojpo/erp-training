@@ -9,10 +9,12 @@ public record DiscountOrderDTO(
         BigDecimal discountValue,
         DiscountOrigin discountOrigin
 ) {
+    //TODO Método desnecessario
     public static DiscountOrderDTO withPercent(BigDecimal discountPercent, DiscountOrigin discountOrigin) {
         return new DiscountOrderDTO(discountPercent, null, discountOrigin);
     }
 
+    //TODO Método desnecessario
     public static DiscountOrderDTO withValue(BigDecimal discountValue, DiscountOrigin discountOrigin) {
         return new DiscountOrderDTO(null, discountValue, discountOrigin);
     }

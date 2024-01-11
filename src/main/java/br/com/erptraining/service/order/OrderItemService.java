@@ -35,6 +35,7 @@ public class OrderItemService {
 
         orderItem.setOrder(order);
 
+        //TODO Pode devolver o save direto
         repository.save(orderItem);
 
         return order;
@@ -49,6 +50,7 @@ public class OrderItemService {
 
         orderItem.setOrder(order);
 
+        //TODO Pode devolver o save direto
         repository.save(orderItem);
 
         return order;
@@ -57,16 +59,26 @@ public class OrderItemService {
 
     private OrderItem formatOrderItem(CreateOrderItemDTO orderItemData) {
 
+//        Product product = findProduct.byId(orderItemData.product_id());
+//
+//        OrderItem orderItem = OrderItem.builder()
+//                .product(product)
+//                .quantity(orderItemData.quantity()).build();
+//
+//        BigDecimal totalValue = product.getPrice().multiply(BigDecimal.valueOf(orderItemData.quantity()));
+//
+//        orderItem.setTotalPrice(totalValue);
+//
+//        return orderItem;
+
+        //TODO voce pode fazer o inverso, nao utilizar o set e retornar a propria criação do objeto
         Product product = findProduct.byId(orderItemData.product_id());
-
-        OrderItem orderItem = OrderItem.builder()
-                .product(product)
-                .quantity(orderItemData.quantity()).build();
-
         BigDecimal totalValue = product.getPrice().multiply(BigDecimal.valueOf(orderItemData.quantity()));
 
-        orderItem.setTotalPrice(totalValue);
-
-        return orderItem;
+        return OrderItem.builder()
+                .product(product)
+                .quantity(orderItemData.quantity())
+                .totalPrice(totalValue)
+                .build();
     }
 }

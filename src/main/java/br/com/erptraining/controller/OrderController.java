@@ -8,7 +8,7 @@ import br.com.erptraining.mapper.OrderMapper;
 import br.com.erptraining.service.order.FindOrderService;
 import br.com.erptraining.service.order.OrderItemService;
 import br.com.erptraining.service.order.UpdateOrderService;
-import jakarta.validation.Valid;
+import jakarta.validation.Valid; //TODO import desnecessario
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +18,7 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api/order") //TODO seria interessante por o endpoint base no plural, pois indica que vc tem varios recursos para o mesmo (nao é obrigatorio)
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -30,6 +30,7 @@ public class OrderController {
     public ResponseEntity<DetailOrderDTO> create(@RequestBody CreateOrderItemDTO orderItemData, UriComponentsBuilder uriBuilder) {
         Order order = orderItemService.saveOnNewOrder(orderItemData);
 
+        //TODO criar constant do path na classe
         URI uri = uriBuilder.path("/api/order/{id}").buildAndExpand(order.getId()).toUri();
 
         DetailOrderDTO detailedOrder = OrderMapper.INSTANCE.toDetailOrder(order);
@@ -42,6 +43,7 @@ public class OrderController {
 
         Order order = orderItemService.saveOnExistingOrder(orderItemData, id);
 
+        //TODO criar constant do path na classe
         URI uri = uriBuilder.path("/api/order/{id}").buildAndExpand(order.getId()).toUri();
 
         DetailOrderDTO detailedOrder = OrderMapper.INSTANCE.toDetailOrder(order);
@@ -54,6 +56,7 @@ public class OrderController {
     public ResponseEntity<DetailOrderDTO> applyDiscount(@PathVariable UUID id, @RequestBody DiscountOrderDTO discountData, UriComponentsBuilder uriBuilder){
         Order order = update.applyDiscount(discountData, id);
 
+        //TODO variável desnecessaria
         URI uri = uriBuilder.path("/api/order/{id}").buildAndExpand(order.getId()).toUri();
 
         DetailOrderDTO detailedOrder = OrderMapper.INSTANCE.toDetailOrder(order);

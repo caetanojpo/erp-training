@@ -7,6 +7,7 @@ public class EntityNotFoundException extends RuntimeException {
         super(objectName + " not found by ID: " + id);
     }
 
+    //TODO Método desnecessario
     public EntityNotFoundException(String msg) {
         super(msg);
     }

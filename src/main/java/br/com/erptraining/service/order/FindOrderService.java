@@ -1,6 +1,7 @@
 package br.com.erptraining.service.order;
 
 import br.com.erptraining.domain.Order;
+import br.com.erptraining.domain.OrderDiscount;
 import br.com.erptraining.exception.EntityNotFoundException;
 import br.com.erptraining.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +30,16 @@ public class FindOrderService {
     }
 
     public boolean discountPermission(UUID id) {
-        Order order = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(Order.class.getSimpleName(), id));
+        //TODO troque essa forma de implementar (Programação imperativa):
+//        Order order = repository.findById(id)
+//                .orElseThrow(() -> new EntityNotFoundException(Order.class.getSimpleName(), id));
+//
+//        return order.getOrderDiscount().isDiscountPermission();
 
-        return order.getOrderDiscount().isDiscountPermission();
+        //TODO por essa (Programação funcional), pois dessa forma você garante que não vai ter null pointer exception em nenhum momento nessa aninhamento: "order.getOrderDiscount().isDiscountPermission()"
+        return repository.findById(id)
+                .map(Order::getOrderDiscount)
+                .map(OrderDiscount::isDiscountPermission)
+                .orElseThrow(() -> new EntityNotFoundException(Order.class.getSimpleName(), id));
     }
 }
