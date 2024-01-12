@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList; //TODO import desnecessario
 import java.util.List;
 
 @Service
@@ -34,11 +33,11 @@ public class CreateOrderService {
 
         Order order = generateOrder(newOrderNumber, orderItemList, discount, orderItem);
 
-       return repository.save(order);
+        return repository.save(order);
 
     }
 
-    private Order generateOrder(Integer orderNumber, List<OrderItem> orderItemList, OrderDiscount discount, OrderItem orderItem){
+    private Order generateOrder(Integer orderNumber, List<OrderItem> orderItemList, OrderDiscount discount, OrderItem orderItem) {
         return Order.builder()
                 .orderNumber(orderNumber)
                 .orderItems(orderItemList)

@@ -4,7 +4,6 @@ import br.com.erptraining.domain.Order;
 import br.com.erptraining.domain.OrderDiscount;
 import br.com.erptraining.domain.OrderItem;
 import br.com.erptraining.dtos.order.DiscountOrderDTO;
-import br.com.erptraining.dtos.orderitem.UpdateOrderItemDTO;
 import br.com.erptraining.enums.OrderStatus;
 import br.com.erptraining.exception.DiscountOrderException;
 import br.com.erptraining.exception.OrderException;
@@ -51,7 +50,7 @@ public class UpdateOrderService {
         return repository.save(order);
     }
 
-    public Order removeOrderItem(UUID orderUUID, UUID orderItemUUID){
+    public Order removeOrderItem(UUID orderUUID, UUID orderItemUUID) {
 
         Order order = find.byId(orderUUID);
 
@@ -79,14 +78,13 @@ public class UpdateOrderService {
     }
 
 
-
     private void verifyOrderStatus(OrderStatus status) {
-        if(!status.equals(OrderStatus.OPEN)){
+        if (!status.equals(OrderStatus.OPEN)) {
             throw new OrderException("Order's status isn't OPEN. Can't make new changes");
         }
     }
 
-    private void validateDiscountPossibility(Order order){
+    private void validateDiscountPossibility(Order order) {
 
         verifyOrderStatus(order.getOrderStatus());
 
@@ -108,7 +106,7 @@ public class UpdateOrderService {
     }
 
     private OrderDiscount generateOrderDiscount(DiscountOrderDTO discountData, BigDecimal discountValue) {
-       return OrderDiscount.builder()
+        return OrderDiscount.builder()
                 .discountPermission(true)
                 .discountOrigin(discountData.discountOrigin())
                 .discountPercent(discountData.discountPercent() != null ? discountData.discountPercent() : null)

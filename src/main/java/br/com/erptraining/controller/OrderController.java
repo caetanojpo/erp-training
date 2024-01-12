@@ -5,7 +5,6 @@ import br.com.erptraining.domain.OrderItem;
 import br.com.erptraining.dtos.order.DetailOrderDTO;
 import br.com.erptraining.dtos.order.DiscountOrderDTO;
 import br.com.erptraining.dtos.orderitem.CreateOrderItemDTO;
-import br.com.erptraining.dtos.orderitem.DetailOrderItem;
 import br.com.erptraining.dtos.orderitem.UpdateOrderItemDTO;
 import br.com.erptraining.mapper.OrderMapper;
 import br.com.erptraining.service.order.FindOrderService;
@@ -73,7 +72,7 @@ public class OrderController {
     }
 
     @PutMapping("/orderItem/remove/{orderUUID}")
-    public ResponseEntity<DetailOrderDTO> removeOrderItem(@PathVariable UUID orderUUID, @RequestBody UUID orderItemUUID){
+    public ResponseEntity<DetailOrderDTO> removeOrderItem(@PathVariable UUID orderUUID, @RequestBody UUID orderItemUUID) {
         Order order = update.removeOrderItem(orderUUID, orderItemUUID);
 
         DetailOrderDTO detailedOrder = OrderMapper.INSTANCE.toDetailOrder(order);
