@@ -263,7 +263,28 @@ class OrderControllerTest {
     }
 
     @Test
-    void removeOrderItem() {
+    @DisplayName("Remove: Should return HTTP 400 when the input data are invalid")
+    void removeOrderItem_first_scenario() throws Exception{
+        UUID orderId = UUID.randomUUID();
+        var response = mvc
+                .perform(put("/api/orders/orderItem/remove/{orderUUID}", orderId))
+                .andReturn().getResponse();
+
+        assertThat(response.getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @Test
+    @DisplayName("Remove: Should return HTTP 200 when the input data are valid")
+    void removeOrderItem_second_scenario() throws Exception{
+        UUID orderId = UUID.randomUUID();
+
+        UUID orderItemUUID = UUID.randomUUID();
+
+        mvc.perform(put("/api/orders/orderItem/remove/{orderUUID}", orderId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(orderItemUUID)))
+                .andExpect(status().isOk());
     }
 
     @Test
