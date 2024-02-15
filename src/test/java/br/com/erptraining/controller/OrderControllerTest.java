@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +30,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,16 +66,6 @@ class OrderControllerTest {
     @MockBean
     private UpdateOrderService update;
 
-    @Test
-    @DisplayName("Create: Should return HTTP 400 when the input data are invalid")
-    void create_first_scenario() throws Exception {
-        var response = mvc
-                .perform(post("/api/orders"))
-                .andReturn().getResponse();
-
-        assertThat(response.getStatus())
-                .isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
 
     @Test
     @DisplayName("Create: Should return HTTP 200 when the input data are valid")
@@ -111,17 +105,6 @@ class OrderControllerTest {
         assertThat(detailedOrder.orderStatus()).isEqualTo(mockedOrder.getOrderStatus());
     }
 
-    @Test
-    @DisplayName("Create on Existing: Should return HTTP 400 when the input data are invalid")
-    void addToExistingOrder_first_scenario() throws Exception {
-        UUID orderId = UUID.randomUUID();
-        var response = mvc
-                .perform(post("/api/orders/{id}", orderId))
-                .andReturn().getResponse();
-
-        assertThat(response.getStatus())
-                .isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
 
     @Test
     @DisplayName("Create on Existing: Should return HTTP 200 when the input data are valid")
@@ -163,17 +146,6 @@ class OrderControllerTest {
         assertThat(detailedOrder.orderStatus()).isEqualTo(mockedOrder.getOrderStatus());
     }
 
-    @Test
-    @DisplayName("Discount: Should return HTTP 400 when the input data are invalid")
-    void applyDiscount_first_scenario() throws Exception {
-        UUID orderId = UUID.randomUUID();
-        var response = mvc
-                .perform(put("/api/orders/discount/{id}", orderId))
-                .andReturn().getResponse();
-
-        assertThat(response.getStatus())
-                .isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
 
     @Test
     @DisplayName("Discount: Should return HTTP 200 when the input data are valid")
@@ -214,18 +186,6 @@ class OrderControllerTest {
         assertThat(detailedOrder.orderStatus()).isEqualTo(mockedOrder.getOrderStatus());
     }
 
-    @Test
-    @DisplayName("Modify: Should return HTTP 400 when the input data are invalid")
-    void modifyQuantity_first_scenario() throws Exception{
-        UUID orderId = UUID.randomUUID();
-        var response = mvc
-                .perform(put("/api/orders/orderItem/{id}", orderId))
-                .andReturn().getResponse();
-
-        assertThat(response.getStatus())
-                .isEqualTo(HttpStatus.BAD_REQUEST.value());
-
-    }
 
     @Test
     @DisplayName("Modify: Should return HTTP 200 when the input data are valid")
@@ -262,17 +222,6 @@ class OrderControllerTest {
         assertThat(detailedOrderItem.totalPrice()).isEqualTo(mockedOrderItem.getTotalPrice());
     }
 
-    @Test
-    @DisplayName("Remove: Should return HTTP 400 when the input data are invalid")
-    void removeOrderItem_first_scenario() throws Exception{
-        UUID orderId = UUID.randomUUID();
-        var response = mvc
-                .perform(put("/api/orders/orderItem/remove/{orderUUID}", orderId))
-                .andReturn().getResponse();
-
-        assertThat(response.getStatus())
-                .isEqualTo(HttpStatus.BAD_REQUEST.value());
-    }
 
     @Test
     @DisplayName("Remove: Should return HTTP 200 when the input data are valid")
@@ -285,6 +234,30 @@ class OrderControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(orderItemUUID)))
                 .andExpect(status().isOk());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getBadRequests")
+    @DisplayName("Should return HTTP 400 when the input data are invalid")
+    void badRequest(MockHttpServletRequestBuilder httpMethod) throws Exception {
+        var response = mvc
+                .perform(httpMethod)
+                .andReturn().getResponse();
+
+        assertThat(response.getStatus())
+                .isEqualTo(HttpStatus.BAD_REQUEST.value());
+    }
+
+    private static Stream<MockHttpServletRequestBuilder> getBadRequests() {
+        UUID orderId = UUID.randomUUID();
+
+        return Stream.of(
+                post("/api/orders"),
+                put("/api/orders/orderItem/remove/{orderUUID}", orderId),
+                put("/api/orders/orderItem/{id}", orderId),
+                put("/api/orders/discount/{id}", orderId),
+                post("/api/orders/{id}", orderId)
+        );
     }
 
     @Test
